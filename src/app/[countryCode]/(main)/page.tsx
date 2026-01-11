@@ -1,17 +1,14 @@
 import { Metadata } from "next";
-
 import FeaturedProducts from "@modules/home/components/featured-products";
 import Hero from "@modules/home/components/hero";
 import { listCollections } from "@lib/data/collections";
 import { getRegion } from "@lib/data/regions";
 
-// 👇 关键修复：强制动态渲染，跳过构建时的数据获取
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: "Medusa Next.js Starter Template",
-  description:
-    "A performant frontend ecommerce starter template with Next.js 15 and Medusa.",
+  title: "Medusa Next.js Store",
+  description: "A real e-commerce store with live products.",
 };
 
 export default async function Home(props: {
@@ -20,23 +17,21 @@ export default async function Home(props: {
   const params = await props.params;
   const { countryCode } = params;
 
+  // 这些现在会连到真实的后端！
   const region = await getRegion(countryCode);
-
   const { collections } = await listCollections({
     fields: "id, handle, title",
   });
 
   if (!collections || !region) {
-    return null;
+    return <div className="py-12 text-center">Failed to load store.</div>;
   }
 
   return (
     <>
       <Hero />
       <div className="py-12">
-        <ul className="flex flex-col gap-x-6">
-          <FeaturedProducts collections={collections} region={region} />
-        </ul>
+        <FeaturedProducts collections={collections} region={region} />
       </div>
     </>
   );
